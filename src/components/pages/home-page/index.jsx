@@ -9,6 +9,7 @@ import { CldImage } from "next-cloudinary";
 
 import Image from "next/image";
 import { toast } from "react-toastify";
+import CloseIcon from "@/assets/svg/close";
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,7 +23,7 @@ const HomePage = () => {
     resolver: yupResolver(vehicleValidation),
   });
 
-  const [imagePreviews, setImagePreviews] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState(["1", "2"]);
   const maxPictures = watch("maxPictures");
 
   const handleFileChange = async (e) => {
@@ -45,16 +46,21 @@ const HomePage = () => {
     setIsLoading(true);
   };
 
+
+  const handleRemove = (index)=>{
+    console.log("index--remove", index)
+  }
+
   return (
     <PageWrapper
       onSubmitHandler={handleSubmit(onSubmitHandler)}
-      title={"Login In"}
+      title={"Car selling service"}
     >
       <div className="form-row">
         <label className="block text-base capitalize font-medium text-gray-900">
           Car Model
         </label>
-        <div className="mt-2.5">
+        <div className="my-2.5">
           <input
             {...register("carModel")}
             placeholder="car model"
@@ -77,7 +83,7 @@ const HomePage = () => {
         <label className="block text-base capitalize font-medium text-gray-900">
           price
         </label>
-        <div className="mt-2.5">
+        <div className="my-2.5">
           <input
             {...register("price")}
             placeholder="1245"
@@ -98,7 +104,7 @@ const HomePage = () => {
         <label className="block text-base capitalize font-medium text-gray-900">
           phone
         </label>
-        <div className="mt-2.5">
+        <div className="my-2.5">
           <input
             {...register("phone")}
             placeholder="03120123456"
@@ -121,7 +127,7 @@ const HomePage = () => {
         <label className="block text-base capitalize font-medium text-gray-900">
           City
         </label>
-        <div className="mt-2.5">
+        <div className="my-2.5">
           {["Lahore", "Islamabad", "Faisalabad", "Karachi"].map((city) => (
             <div key={city} className="flex items-center mb-2">
               <input
@@ -153,7 +159,7 @@ const HomePage = () => {
         <label className="block text-base capitalize font-medium text-gray-900">
           maxPictures
         </label>
-        <div className="mt-2.5">
+        <div className="my-2.5">
           <select
             {...register("maxPictures")}
             className={`px-4 py-2.5 w-full text-gray-600 border rounded-md focus-visible:outline-none`}
@@ -183,22 +189,30 @@ const HomePage = () => {
             onChange={handleFileChange}
           />
         </div>
-        <ul className="flex gap-2.5">
-          {imagePreviews.map((src, idx) => (
+
+        
+        {imagePreviews.length >= 0 && 
+
+        <ul className="flex mt-2.5 gap-2.5">
+          {imagePreviews.map((src, index) => (
             <li
-              key={idx}
-              className="min-h-[100px] min-w-[100px] w-full rounded-2xl border border-gray-600"
+              key={index}
+              className="group w-20 min-w-20 h-20 border rounded-lg p-2 border-gray-700 relative "
             >
+              <span className="group-hover:opacity-100 opacity-0 group-hover:visible cursor-pointer invisible absolute inset-0 m-auto w-8 h-8 z-10" onClick={()=>handleRemove(index)}>
+                <CloseIcon />
+              </span>
               <Image
-                width={150}
-                height={150}
-                src={src}
-                className="w-full h-full"
-                alt={`Preview ${idx}`}
+                width={100}
+                height={100}
+                src={"/next.svg"}
+                className="w-full h-full group-hover:opacity-50"
+                alt={`Preview ${index}`}
               />
             </li>
           ))}
         </ul>
+        }
       </div>
 
       <div className="form-row mt-1.5">
