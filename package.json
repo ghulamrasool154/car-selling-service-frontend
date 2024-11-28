@@ -1,0 +1,29 @@
+{
+  "name": "test-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
+    "cloudinary": "^2.5.1",
+    "next": "13.5.7",
+    "next-cloudinary": "^6.16.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.53.2",
+    "react-toastify": "^10.0.6",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10",
+    "eslint": "^8",
+    "eslint-config-next": "13.5.7",
+    "postcss": "^8",
+    "tailwindcss": "^3"
+  }
+}
