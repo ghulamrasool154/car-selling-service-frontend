@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 export async function POST(request) {
   const body = await request.json();
   const authCookie = request.cookies.get("auth")?.value;
+  console.log("authCookie", authCookie);
 
   if (!authCookie) {
   }

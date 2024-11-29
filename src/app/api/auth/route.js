@@ -10,7 +10,7 @@ export async function POST(request) {
     success: true,
   };
   try {
-    let response = await axios.post(`${process.env.api_url}auth`, body);
+    let response = (await axios.post(`${process.env.api_url}auth`, body)).data;
 
     const authData = JSON.stringify(response.data);
     responseObject.status = 200;
