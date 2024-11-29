@@ -6,13 +6,18 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import PageWrapper from "@/components/wrapper/page-wrapper";
 import EyeIcon from "@/assets/svg/eye-icon";
 import EyeIcon2 from "@/assets/svg/eye-icon2";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [hideShow, setHideShow] = useState(true);
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitted },
     trigger,
   } = useForm({
@@ -22,8 +27,18 @@ const LoginPage = () => {
     shouldUnregister: true,
   });
 
-  const onSubmitHandler = (data) => {
+  const onSubmitHandler = async (data) => {
     setIsLoading(true);
+    try {
+      let response = await axios.post("/api/auth", data);
+      toast.success(response.data.message);
+      reset();
+      router.push("/");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const hideShowPasswordHandler = () => setHideShow(!hideShow);

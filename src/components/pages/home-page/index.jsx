@@ -5,11 +5,12 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { vehicleValidation } from "@/utils/validation";
-import { CldImage } from "next-cloudinary";
+import axios from "axios";
 
 import Image from "next/image";
 import { toast } from "react-toastify";
 import CloseIcon from "@/assets/svg/close";
+
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,39 +18,84 @@ const HomePage = () => {
     register,
     handleSubmit,
     trigger,
+    reset,
     watch,
     formState: { errors, isSubmitted },
   } = useForm({
     resolver: yupResolver(vehicleValidation),
   });
 
-  const [imagePreviews, setImagePreviews] = useState(["1", "2"]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [allImages, setAllImages] = useState([]);
   const maxPictures = watch("maxPictures");
 
   const handleFileChange = async (e) => {
+    setIsLoading(true);
     const files = Array.from(e.target.files);
-
     if (files.length + imagePreviews.length > maxPictures) {
       toast.error("You can only upload a limited number of pictures.");
+      setImagePreviews([]);
+      setIsLoading(false);
       return;
     }
 
     const newPreviews = files.map((file) => URL.createObjectURL(file));
 
-    setImagePreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
-
-    console.log("===>", files, newPreviews);
+    let images = [];
+    setImagePreviews((old) => [...old, ...newPreviews]);
+    files.map((file) => {
+      const data = new FormData();
+      data.append("file", file);
+      data.append("upload_preset", "nxcuaega");
+      data.append("cloud_name", "dwbgu2shb");
+      fetch("https://api.cloudinary.com/v1_1/dwbgu2shb/image/upload", {
+        method: "post",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          images.push(data.url);
+        })
+        .catch((err) => {
+          toast.error("something uploading image issue", err);
+        })
+        .finally(() => {
+          setAllImages(images);
+          setIsLoading(false);
+        });
+    });
   };
 
-  const onSubmitHandler = (data) => {
-    console.log("data", { data, imagePreviews });
+  const onSubmitHandler = async (data) => {
+    if (allImages.length === 0) {
+      toast.error("Image is Required.");
+      return;
+    }
+
     setIsLoading(true);
+    try {
+      let response = await axios.post("/api/vehicle", { ...data, allImages });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        reset();
+        setImagePreviews([]);
+        setAllImages([]);
+      }
+
+      setIsLoading(false);
+    } catch (error) {
+      let errors = error.response.data;
+      if (errors.error) {
+        toast.error(errors.message);
+      }
+      setIsLoading(false);
+    }
   };
 
-
-  const handleRemove = (index)=>{
-    console.log("index--remove", index)
-  }
+  const handleRemove = (index) => {
+    setAllImages((old) => old.filter((_, i) => i !== index));
+    setImagePreviews((old) => old.filter((_, i) => i !== index));
+  };
 
   return (
     <PageWrapper
@@ -190,29 +236,30 @@ const HomePage = () => {
           />
         </div>
 
-        
-        {imagePreviews.length >= 0 && 
-
-        <ul className="flex mt-2.5 gap-2.5">
-          {imagePreviews.map((src, index) => (
-            <li
-              key={index}
-              className="group w-20 min-w-20 h-20 border rounded-lg p-2 border-gray-700 relative "
-            >
-              <span className="group-hover:opacity-100 opacity-0 group-hover:visible cursor-pointer invisible absolute inset-0 m-auto w-8 h-8 z-10" onClick={()=>handleRemove(index)}>
-                <CloseIcon />
-              </span>
-              <Image
-                width={100}
-                height={100}
-                src={"/next.svg"}
-                className="w-full h-full group-hover:opacity-50"
-                alt={`Preview ${index}`}
-              />
-            </li>
-          ))}
-        </ul>
-        }
+        {imagePreviews.length >= 0 && (
+          <ul className="flex mt-2.5 gap-2.5">
+            {imagePreviews.map((src, index) => (
+              <li
+                key={index}
+                className="group w-20 min-w-20 h-20 border rounded-lg p-2 border-gray-700 relative before:content-[ ] overflow-hidden before:absolute before:bg-indigo-400 before:opacity-0 hover:before:opacity-80 before:inset-0 before:w-full before:h-full "
+              >
+                <span
+                  className="group-hover:opacity-100 opacity-0 group-hover:visible cursor-pointer invisible absolute inset-0 m-auto w-8 h-8 z-10"
+                  onClick={() => handleRemove(index)}
+                >
+                  <CloseIcon />
+                </span>
+                <Image
+                  width={100}
+                  height={100}
+                  src={src}
+                  className="w-full h-full "
+                  alt={`Preview ${index}`}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="form-row mt-1.5">

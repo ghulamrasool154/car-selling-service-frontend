@@ -7,8 +7,8 @@ export const loginValidation = yup.object().shape({
     .min(8, "Password must be at least 8 characters")
     .max(94, "Password cannot exceed 94 characters")
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
-      "Password must include at least one uppercase letter, one lowercase letter, and one number"
+      /^(?=.*[a-z])(?=.*\d).+$/,
+      "Password must include at least one lowercase letter, and one number"
     )
     .required("Password is required"),
 });
