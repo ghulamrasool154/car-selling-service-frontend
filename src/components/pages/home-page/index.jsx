@@ -253,7 +253,7 @@ const HomePage = () => {
                   width={100}
                   height={100}
                   src={src}
-                  className="w-full h-full "
+                  className="w-full h-full object-contain"
                   alt={`Preview ${index}`}
                 />
               </li>
